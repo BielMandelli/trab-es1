@@ -123,7 +123,7 @@ public class ReceitaService {
     }
 
     @Transactional
-    public ReceitaIngrediente atualizarQuantidadeIngrediente(Long idReceita, Long idIngrediente, @Valid AlterarReceitaIngredienteQuantidadeDTO dto) {
+    public ReceitaIngrediente atualizarQuantidadeIngrediente(Long idReceita, Long idIngrediente, @Valid AtualizarQuantidadeIngredienteDTO dto) {
         ReceitaIngrediente receitaIngrediente = encontrarReceitaIngrediente(idReceita, idIngrediente);
 
         receitaIngrediente.setQuantidade(dto.quantidade());

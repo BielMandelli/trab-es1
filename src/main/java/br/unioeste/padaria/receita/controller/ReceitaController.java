@@ -66,7 +66,7 @@ public class ReceitaController {
     public ResponseEntity<ReceitaIngrediente> atualizarQuantidadeIngrediente(
             @PathVariable Long idReceita,
             @PathVariable Long idIngrediente,
-            @Valid @RequestBody AlterarReceitaIngredienteQuantidadeDTO dto) {
+            @Valid @RequestBody AtualizarQuantidadeIngredienteDTO dto) {
         return ResponseEntity.ok(receitaService.atualizarQuantidadeIngrediente(idReceita, idIngrediente, dto));
     }
 
