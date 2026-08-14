@@ -2,12 +2,9 @@ package br.unioeste.padaria.receita.service;
 
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import br.unioeste.padaria.ingrediente.repository.IngredienteRepository;
+import br.unioeste.padaria.receita.model.dto.*;
 import br.unioeste.padaria.receita.model.entity.Receita;
 import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
-import br.unioeste.padaria.receita.model.dto.CriarReceitaDTO;
-import br.unioeste.padaria.receita.model.dto.ReceitaIngredienteDTO;
-import br.unioeste.padaria.receita.model.dto.ReceitaIngredienteQuantidadeDTO;
-import br.unioeste.padaria.receita.model.dto.AtualizarReceitaDTO;
 import br.unioeste.padaria.receita.repository.ReceitaRepository;
 import br.unioeste.padaria.utils.SpecificationUtils;
 import jakarta.transaction.Transactional;
@@ -19,6 +16,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -29,6 +30,7 @@ public class ReceitaService {
     private final ReceitaRepository receitaRepository;
     private final IngredienteRepository ingredienteRepository;
 
+    @Transactional
     public Receita salvarReceita(@Valid CriarReceitaDTO dto) {
         Receita receita = new Receita();
 
@@ -37,21 +39,44 @@ public class ReceitaService {
         receita.setRendimento(dto.rendimento());
         receita.setTempoPreparacao(dto.tempoPreparacao());
 
+        for (CriarReceitaIngredienteDTO criarReceitaIngredienteDTO : dto.ingredientes()) {
+
+            Ingrediente ingrediente = this.buscarIngredientePorId(criarReceitaIngredienteDTO.idIngrediente());
+
+            boolean jaAdicionado = receita.getIngredientList().stream().anyMatch(item -> item.getIngrediente().getIdIngrediente().equals(criarReceitaIngredienteDTO.idIngrediente()));
+
+            if (jaAdicionado) continue;
+
+            ReceitaIngrediente receitaIngrediente = new ReceitaIngrediente();
+
+            receitaIngrediente.setReceita(receita);
+            receitaIngrediente.setIngrediente(ingrediente);
+            receitaIngrediente.setQuantidade(criarReceitaIngredienteDTO.quantidade());
+
+            receita.getIngredientList().add(receitaIngrediente);
+        }
+
         return receitaRepository.save(receita);
     }
 
-    public Page<Receita> listarTodasReceitas(String nomeReceita, Pageable pageable) {
+    public Page<ReceitaDTO> listarTodasReceitas(String nomeReceita, Pageable pageable) {
         Specification<Receita> specification = Specification.allOf();
 
         if (nomeReceita != null && !nomeReceita.isBlank()) {
             specification = specification.and(SpecificationUtils.containsIgnoreCase("nomeReceita", nomeReceita));
         }
 
-        return receitaRepository.findAll(specification, pageable);
+        Page<Receita> receitaPage = receitaRepository.findAll(specification, pageable);
+
+        return receitaPage.map(this::formatarReceita);
     }
 
     public Receita buscarReceitaPorId(Long idReceita) {
         return receitaRepository.findById(idReceita).orElseThrow(() -> naoEncontradoErro("Receita", idReceita));
+    }
+
+    public Ingrediente buscarIngredientePorId(Long idIngrediente) {
+        return ingredienteRepository.findById(idIngrediente).orElseThrow(() -> naoEncontradoErro("Ingrediente", idIngrediente));
     }
 
     @Transactional
@@ -75,19 +100,18 @@ public class ReceitaService {
     }
 
     @Transactional
-    public ReceitaIngrediente adicionarReceitaIngrediente(Long idReceita, @Valid ReceitaIngredienteDTO dto) {
+    public ReceitaIngrediente adicionarReceitaIngrediente(Long idReceita, @Valid CriarReceitaIngredienteDTO dto) {
         Receita receita = buscarReceitaPorId(idReceita);
 
         boolean jaAdicionado = receita.getIngredientList().stream().anyMatch(item -> item.getIngrediente().getIdIngrediente().equals(dto.idIngrediente()));
 
-        if (jaAdicionado) {
-            throw new ResponseStatusException(BAD_REQUEST, "Ingrediente já está nessa receita");
-        }
+        if (jaAdicionado) throw new ResponseStatusException(BAD_REQUEST, "Ingrediente já está nessa receita");
 
-        Ingrediente ingrediente = ingredienteRepository.findById(dto.idIngrediente()).orElseThrow(() -> naoEncontradoErro("Ingrediente", dto.idIngrediente()));
+        Ingrediente ingrediente = this.buscarIngredientePorId(dto.idIngrediente());
 
         ReceitaIngrediente receitaIngrediente = new ReceitaIngrediente();
 
+        receitaIngrediente.setIdReceitaIngrediente(receita.getIdReceita());
         receitaIngrediente.setReceita(receita);
         receitaIngrediente.setIngrediente(ingrediente);
         receitaIngrediente.setQuantidade(dto.quantidade());
@@ -99,7 +123,7 @@ public class ReceitaService {
     }
 
     @Transactional
-    public ReceitaIngrediente atualizarQuantidadeIngrediente(Long idReceita, Long idIngrediente, @Valid ReceitaIngredienteQuantidadeDTO dto) {
+    public ReceitaIngrediente atualizarQuantidadeIngrediente(Long idReceita, Long idIngrediente, @Valid AlterarReceitaIngredienteQuantidadeDTO dto) {
         ReceitaIngrediente receitaIngrediente = encontrarReceitaIngrediente(idReceita, idIngrediente);
 
         receitaIngrediente.setQuantidade(dto.quantidade());
@@ -135,5 +159,114 @@ public class ReceitaService {
 
     private ResponseStatusException naoEncontradoErro(String entidade, Long id) {
         return new ResponseStatusException(NOT_FOUND, entidade + " com id " + id + " não encontrado");
+    }
+
+    public ReceitaDTO formatarReceita(Receita receita) {
+
+        List<ReceitaIngredienteDTO> ingredienteList = receita.getIngredientList()
+                .stream()
+                .map(receitaIngrediente -> {
+                    Ingrediente ingrediente = receitaIngrediente.getIngrediente();
+
+                    return new ReceitaIngredienteDTO(
+                            ingrediente.getIdIngrediente(),
+                            ingrediente.getNomeIngrediente(),
+                            ingrediente.getCategoriaIngrediente(),
+                            ingrediente.getUnidadeIngrediente(),
+                            ingrediente.getPrecoPorUnidade(),
+                            ingrediente.getEstoqueAtual(),
+                            receitaIngrediente.getQuantidade()
+                    );
+                })
+                .toList();
+
+        BigDecimal precoPorUnidade = calcularPrecoPorUnidade(receita.getIngredientList());
+        BigDecimal precoPorReceita = calcularPrecoPorReceita(precoPorUnidade, receita.getRendimento());
+
+        return new ReceitaDTO(
+                receita.getIdReceita(),
+                receita.getNomeReceita(),
+                receita.getPrecoVenda(),
+                receita.getRendimento(),
+                receita.getTempoPreparacao(),
+                ingredienteList,
+                precoPorUnidade,
+                precoPorReceita
+        );
+    }
+
+    private BigDecimal calcularPrecoPorUnidade(List<ReceitaIngrediente> ingredienteList){
+        BigDecimal custoTotal = BigDecimal.ZERO;
+
+        for (ReceitaIngrediente receitaIngrediente : ingredienteList){
+            BigDecimal valorUnidade = receitaIngrediente.getIngrediente().getPrecoPorUnidade();
+            BigDecimal quantidade = receitaIngrediente.getQuantidade();
+
+            BigDecimal custoIngrediente = valorUnidade.multiply(quantidade);
+            custoTotal = custoTotal.add(custoIngrediente);
+        }
+
+        return custoTotal;
+    }
+
+    private BigDecimal calcularPrecoPorReceita(BigDecimal precoPorUnidade, Integer rendimento){
+        return precoPorUnidade.multiply(BigDecimal.valueOf(rendimento));
+    }
+
+    public SimulacaoReceitaDTO simularReceita(@Valid CriarSimulacaoReceitaDTO dto) {
+        Receita receita = this.buscarReceitaPorId(dto.idReceita());
+
+        if (dto.lotes() <= 0) {throw new ResponseStatusException(BAD_REQUEST, "A quantidade de lotes deve ser maior que zero");}
+
+        BigDecimal lotesDecimal = BigDecimal.valueOf(dto.lotes());
+
+        List<SimulacaoIngredienteDTO> ingredientes = new ArrayList<>();
+
+        int maximoLotes = Integer.MAX_VALUE;
+        boolean ingredientesSuficientes = true;
+
+        BigDecimal custoTotal = BigDecimal.ZERO;
+
+        for (ReceitaIngrediente receitaIngrediente : receita.getIngredientList()) {
+
+            Ingrediente ingrediente = receitaIngrediente.getIngrediente();
+
+            BigDecimal quantidadePorLote = receitaIngrediente.getQuantidade();
+            BigDecimal quantidadeNecessaria = quantidadePorLote.multiply(lotesDecimal);
+
+            BigDecimal estoqueAtual = BigDecimal.valueOf(ingrediente.getEstoqueAtual());
+            BigDecimal saldoAposProducao = estoqueAtual.subtract(quantidadeNecessaria);
+
+            boolean suficiente = estoqueAtual.compareTo(quantidadeNecessaria) >= 0;
+
+            if (!suficiente) ingredientesSuficientes = false;
+
+            int lotesPossiveis = estoqueAtual.divideToIntegralValue(quantidadePorLote).intValue();
+
+            maximoLotes = Math.min(maximoLotes, lotesPossiveis);
+
+            BigDecimal custoIngrediente = ingrediente.getPrecoPorUnidade().multiply(quantidadeNecessaria);
+            custoTotal = custoTotal.add(custoIngrediente);
+
+            ingredientes.add(
+                    new SimulacaoIngredienteDTO(
+                            ingrediente.getNomeIngrediente(),
+                            quantidadeNecessaria,
+                            estoqueAtual,
+                            saldoAposProducao,
+                            suficiente
+                    )
+            );
+        }
+
+        return new SimulacaoReceitaDTO(
+                receita.getIdReceita(),
+                receita.getNomeReceita(),
+                dto.lotes(),
+                custoTotal,
+                maximoLotes,
+                ingredientesSuficientes,
+                ingredientes
+        );
     }
 }

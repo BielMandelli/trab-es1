@@ -78,4 +78,6 @@ public class IngredienteController {
             (@PathVariable Long id) {
         return ResponseEntity.ok(ingredienteService.buscarUnidadeIngredientePorId(id));
     }
+
+
 }

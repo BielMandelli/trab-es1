@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record ReceitaIngredienteQuantidadeDTO(
+public record AlterarReceitaIngredienteQuantidadeDTO(
         @NotNull
         @DecimalMin(value = "0.0", inclusive = false)
         BigDecimal quantidade

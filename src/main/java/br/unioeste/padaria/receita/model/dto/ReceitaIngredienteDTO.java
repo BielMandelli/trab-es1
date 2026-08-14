@@ -1,15 +1,17 @@
 package br.unioeste.padaria.receita.model.dto;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
+import br.unioeste.padaria.ingrediente.model.entity.CategoriaIngrediente;
+import br.unioeste.padaria.ingrediente.model.entity.UnidadeIngrediente;
 
 import java.math.BigDecimal;
 
 public record ReceitaIngredienteDTO(
-        @NotNull
         Long idIngrediente,
-        @NotNull
-        @DecimalMin(value = "0.0", inclusive = false)
+        String nomeIngrediente,
+        CategoriaIngrediente categoriaIngrediente,
+        UnidadeIngrediente unidadeIngrediente,
+        BigDecimal precoPorUnidade,
+        Integer estoqueAtual,
         BigDecimal quantidade
 ) {
 }

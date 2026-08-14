@@ -4,6 +4,8 @@ import br.unioeste.padaria.assistant.dto.IntencaoAssistenteDTO;
 import br.unioeste.padaria.assistant.dto.RespostaChatDTO;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import br.unioeste.padaria.ingrediente.service.IngredienteService;
+import br.unioeste.padaria.receita.model.dto.ReceitaDTO;
+import br.unioeste.padaria.receita.model.dto.ReceitaIngredienteDTO;
 import br.unioeste.padaria.receita.model.entity.Receita;
 import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
 import br.unioeste.padaria.receita.service.ReceitaService;
@@ -133,11 +135,11 @@ public class AssistenteService {
     private String encontrarReceitaPeloNome(String nomeReceita) {
         if (nomeReceita == null || nomeReceita.isBlank()) return "Informe o nome da receita que deseja consultar.";
 
-        Page<Receita> recipes = receitaService.listarTodasReceitas(nomeReceita, PageRequest.of(0, 10));
+        Page<ReceitaDTO> recipes = receitaService.listarTodasReceitas(nomeReceita, PageRequest.of(0, 10));
 
         if (recipes.isEmpty()) return "Não encontrei uma receita com o nome " + nomeReceita + ".";
 
-        return recipes.getContent().stream().map(this::formatarReceita).collect(Collectors.joining("\n"));
+        return recipes.getContent().stream().map(this::formatarReceitaDTO).collect(Collectors.joining("\n"));
     }
 
     private String encontrarReceitaPeloId(Long idReceita) {
@@ -147,11 +149,11 @@ public class AssistenteService {
     }
 
     private String listarReceitas() {
-        Page<Receita> recipes = receitaService.listarTodasReceitas(null, PageRequest.of(0, 10));
+        Page<ReceitaDTO> recipes = receitaService.listarTodasReceitas(null, PageRequest.of(0, 10));
 
         if (recipes.isEmpty()) return "Não há receitas cadastradas.";
 
-        return "Receitas cadastradas: " + recipes.getContent().stream().map(Receita::getNomeReceita).collect(Collectors.joining(", ")) + ".";
+        return "Receitas cadastradas: " + recipes.getContent().stream().map(ReceitaDTO::nomeReceita).collect(Collectors.joining(", ")) + ".";
     }
 
     private String encontrarIngredientePeloNome(String nomeIngrediente) {
@@ -185,9 +187,26 @@ public class AssistenteService {
                 + " e possui os ingredientes: " + ingredients;
     }
 
-    private String formatarReceitaIngrediente(ReceitaIngrediente item) {
-        String abbreviation = item.getIngrediente().getUnidadeIngrediente().getAbreviacaoUnidade();
-        return item.getIngrediente().getNomeIngrediente() + ": " + item.getQuantidade()
+    private String formatarReceitaDTO(ReceitaDTO receitaDTO) {
+        String ingredients = receitaDTO.ingredientes().isEmpty()
+                ? "Nenhum ingrediente cadastrado."
+                : receitaDTO.ingredientes().stream()
+                .map(this::formatarReceitaIngrediente)
+                .collect(Collectors.joining(", "));
+
+        return "A receita " + receitaDTO.nomeReceita() + " custa R$ " + receitaDTO.precoVenda()
+                + " e possui os ingredientes: " + ingredients;
+    }
+
+    private String formatarReceitaIngrediente(ReceitaIngrediente receitaIngredienteDTO) {
+        String abbreviation = receitaIngredienteDTO.getIngrediente().getUnidadeIngrediente().getAbreviacaoUnidade();
+        return receitaIngredienteDTO.getIngrediente().getNomeIngrediente() + ": " + receitaIngredienteDTO.getQuantidade()
+                + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
+    }
+
+    private String formatarReceitaIngrediente(ReceitaIngredienteDTO receitaIngredienteDTO) {
+        String abbreviation = receitaIngredienteDTO.unidadeIngrediente().getAbreviacaoUnidade();
+        return receitaIngredienteDTO.nomeIngrediente() + ": " + receitaIngredienteDTO.quantidade()
                 + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
     }
 

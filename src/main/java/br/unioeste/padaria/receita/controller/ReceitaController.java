@@ -1,11 +1,8 @@
 package br.unioeste.padaria.receita.controller;
 
+import br.unioeste.padaria.receita.model.dto.*;
 import br.unioeste.padaria.receita.model.entity.Receita;
 import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
-import br.unioeste.padaria.receita.model.dto.CriarReceitaDTO;
-import br.unioeste.padaria.receita.model.dto.ReceitaIngredienteDTO;
-import br.unioeste.padaria.receita.model.dto.ReceitaIngredienteQuantidadeDTO;
-import br.unioeste.padaria.receita.model.dto.AtualizarReceitaDTO;
 import br.unioeste.padaria.receita.service.ReceitaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,35 +27,38 @@ public class ReceitaController {
     private final ReceitaService receitaService;
 
     @PostMapping
-    public ResponseEntity<Receita> salvarReceita(
+    public ResponseEntity<ReceitaDTO> salvarReceita(
             @Valid @RequestBody CriarReceitaDTO dto) {
-        return ResponseEntity.ok(receitaService.salvarReceita(dto));
+        Receita receita = receitaService.salvarReceita(dto);
+        return ResponseEntity.ok(receitaService.formatarReceita(receita));
     }
 
     @GetMapping
-    public ResponseEntity<Page<Receita>> listarTodasReceitas(
+    public ResponseEntity<Page<ReceitaDTO>> listarTodasReceitas(
             @RequestParam(required = false) String nomeReceita,
             Pageable pageable) {
         return ResponseEntity.ok(receitaService.listarTodasReceitas(nomeReceita, pageable));
     }
 
     @GetMapping("/{idReceita}")
-    public ResponseEntity<Receita> buscarReceitaPorId(
+    public ResponseEntity<ReceitaDTO> buscarReceitaPorId(
             @PathVariable Long idReceita) {
-        return ResponseEntity.ok(receitaService.buscarReceitaPorId(idReceita));
+        Receita receita = receitaService.buscarReceitaPorId(idReceita);
+        return ResponseEntity.ok(receitaService.formatarReceita(receita));
     }
 
     @PatchMapping("/{idReceita}")
-    public ResponseEntity<Receita> atualizarReceita(
+    public ResponseEntity<ReceitaDTO> atualizarReceita(
             @PathVariable Long idReceita,
             @Valid @RequestBody AtualizarReceitaDTO dto) {
-        return ResponseEntity.ok(receitaService.atualizarReceita(idReceita, dto));
+        Receita receita = receitaService.atualizarReceita(idReceita, dto);
+        return ResponseEntity.ok(receitaService.formatarReceita(receita));
     }
 
     @PostMapping("/{idReceita}/ingrediente")
     public ResponseEntity<ReceitaIngrediente> adicionarReceitaIngrediente(
             @PathVariable Long idReceita,
-            @Valid @RequestBody ReceitaIngredienteDTO dto) {
+            @Valid @RequestBody CriarReceitaIngredienteDTO dto) {
         return ResponseEntity.ok(receitaService.adicionarReceitaIngrediente(idReceita, dto));
     }
 
@@ -66,11 +66,11 @@ public class ReceitaController {
     public ResponseEntity<ReceitaIngrediente> atualizarQuantidadeIngrediente(
             @PathVariable Long idReceita,
             @PathVariable Long idIngrediente,
-            @Valid @RequestBody ReceitaIngredienteQuantidadeDTO dto) {
+            @Valid @RequestBody AlterarReceitaIngredienteQuantidadeDTO dto) {
         return ResponseEntity.ok(receitaService.atualizarQuantidadeIngrediente(idReceita, idIngrediente, dto));
     }
 
-    @DeleteMapping("/{idReceita}/ingredient/{idIngrediente}")
+    @DeleteMapping("/{idReceita}/ingrediente/{idIngrediente}")
     public ResponseEntity<Void> removerReceitaIngrediente(
             @PathVariable Long idReceita,
             @PathVariable Long idIngrediente) {
@@ -79,9 +79,14 @@ public class ReceitaController {
     }
 
     @DeleteMapping("/{idReceita}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<Void> deletarReceita(
             @PathVariable Long idReceita) {
         receitaService.deletar(idReceita);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/simular")
+    public ResponseEntity<SimulacaoReceitaDTO> simularReceita(@RequestBody @Valid CriarSimulacaoReceitaDTO dto){
+        return ResponseEntity.ok(receitaService.simularReceita(dto));
     }
 }
