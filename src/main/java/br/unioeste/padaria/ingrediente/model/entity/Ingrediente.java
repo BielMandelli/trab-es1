@@ -1,4 +1,4 @@
-package br.unioeste.padaria.ingredient.model.entity;
+package br.unioeste.padaria.ingrediente.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,17 +13,17 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ingredient")
-public class Ingredient {
+@Table(name = "ingrediente")
+public class Ingrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
+    Long idIngrediente;
+    String nomeIngrediente;
     @ManyToOne
-    IngredientCategory ingredientCategory;
+    CategoriaIngrediente categoriaIngrediente;
     @ManyToOne
-    IngredientUnit ingredientUnit;
-    BigDecimal pricePerUnit;
-    Integer stock;
-    Integer minStock;
+    UnidadeIngrediente unidadeIngrediente;
+    BigDecimal precoPorUnidade;
+    Integer estoqueAtual;
+    Integer estoqueMinimo;
 }

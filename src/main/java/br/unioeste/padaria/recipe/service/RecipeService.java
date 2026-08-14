@@ -1,6 +1,5 @@
 package br.unioeste.padaria.recipe.service;
 
-import br.unioeste.padaria.ingredient.model.entity.Ingredient;
 import br.unioeste.padaria.ingredient.repository.IngredientRepository;
 import br.unioeste.padaria.recipe.model.Recipe;
 import br.unioeste.padaria.recipe.model.RecipeIngredient;
@@ -10,7 +9,6 @@ import br.unioeste.padaria.recipe.model.dto.RecipeIngredientQuantityDTO;
 import br.unioeste.padaria.recipe.model.dto.RecipeUpdateDTO;
 import br.unioeste.padaria.recipe.repository.RecipeRepository;
 import br.unioeste.padaria.utils.SpecificationUtils;
-import jakarta.persistence.criteria.Path;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Locale;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -81,18 +77,18 @@ public class RecipeService {
     public RecipeIngredient addIngredient(Long recipeId, @Valid RecipeIngredientDTO dto) {
         Recipe recipe = findById(recipeId);
 
-        boolean alreadyAdded = recipe.getIngredientList().stream().anyMatch(item -> item.getIngredient().getId().equals(dto.ingredientId()));
+        boolean alreadyAdded = recipe.getIngredientList().stream().anyMatch(item -> item.getIngrediente().getId().equals(dto.ingredientId()));
 
         if (alreadyAdded) {
             throw new ResponseStatusException(BAD_REQUEST, "Ingredient is already in this recipe");
         }
 
-        Ingredient ingredient = ingredientRepository.findById(dto.ingredientId()).orElseThrow(() -> notFound("Ingredient", dto.ingredientId()));
+        br.unioeste.padaria.ingredient.model.entity.Ingrediente ingrediente = ingredientRepository.findById(dto.ingredientId()).orElseThrow(() -> notFound("Ingredient", dto.ingredientId()));
 
         RecipeIngredient recipeIngredient = new RecipeIngredient();
 
         recipeIngredient.setRecipe(recipe);
-        recipeIngredient.setIngredient(ingredient);
+        recipeIngredient.setIngrediente(ingrediente);
         recipeIngredient.setQuantity(dto.quantity());
         recipe.getIngredientList().add(recipeIngredient);
 
@@ -129,7 +125,7 @@ public class RecipeService {
 
     private RecipeIngredient findRecipeIngredient(Recipe recipe, Long ingredientId) {
         return recipe.getIngredientList().stream()
-                .filter(item -> item.getIngredient().getId().equals(ingredientId))
+                .filter(item -> item.getIngrediente().getId().equals(ingredientId))
                 .findFirst()
                 .orElseThrow(() -> notFound("Ingredient in recipe", ingredientId));
     }

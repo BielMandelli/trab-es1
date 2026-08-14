@@ -1,4 +1,4 @@
-package br.unioeste.padaria.ingredient.model.dto;
+package br.unioeste.padaria.ingrediente.model.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
@@ -7,22 +7,22 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
-public record IngredientCreateDTO(
+public record CriarIngredienteDTO(
         @NotNull
         @NotEmpty
-        String name,
+        String nomeIngrediente,
         @NotNull
-        Long idCategory,
+        Long idCategoriaIngrediente,
         @NotNull
-        Long idUnit,
+        Long idUnidadeIngrediente,
         @NotNull
         @DecimalMin(value = "0.0", inclusive = false)
-        BigDecimal pricePerUnit,
+        BigDecimal precoPorUnidade,
         @NotNull
         @PositiveOrZero
-        Integer stock,
+        Integer estoqueAtual,
         @NotNull
         @PositiveOrZero
-        Integer minStock
+        Integer estoqueMinimo
 ) {
 }

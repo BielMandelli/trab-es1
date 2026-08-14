@@ -1,6 +1,5 @@
 package br.unioeste.padaria.recipe.model;
 
-import br.unioeste.padaria.ingredient.model.entity.Ingredient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,7 +30,7 @@ public class RecipeIngredient {
     Recipe recipe;
 
     @ManyToOne
-    Ingredient ingredient;
+    br.unioeste.padaria.ingredient.model.entity.Ingrediente ingrediente;
 
     BigDecimal quantity;
 }

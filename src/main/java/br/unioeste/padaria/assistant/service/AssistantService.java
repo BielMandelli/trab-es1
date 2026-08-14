@@ -2,8 +2,6 @@ package br.unioeste.padaria.assistant.service;
 
 import br.unioeste.padaria.assistant.dto.AssistantIntent;
 import br.unioeste.padaria.assistant.dto.ChatResponseDTO;
-import br.unioeste.padaria.ingredient.model.entity.Ingredient;
-import br.unioeste.padaria.ingredient.service.IngredientService;
 import br.unioeste.padaria.recipe.model.Recipe;
 import br.unioeste.padaria.recipe.model.RecipeIngredient;
 import br.unioeste.padaria.recipe.service.RecipeService;
@@ -41,7 +39,7 @@ public class AssistantService {
             """;
 
     private final RecipeService recipeService;
-    private final IngredientService ingredientService;
+    private final br.unioeste.padaria.ingredient.service.IngredienteService ingredienteService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final RestClient restClient = RestClient.builder()
@@ -168,7 +166,7 @@ public class AssistantService {
         if (name == null || name.isBlank()) {
             return "Informe o nome do ingrediente que deseja consultar.";
         }
-        Page<Ingredient> ingredients = ingredientService.findAll(name, null, PageRequest.of(0, 10));
+        Page<br.unioeste.padaria.ingredient.model.entity.Ingrediente> ingredients = ingredienteService.findAll(name, null, PageRequest.of(0, 10));
         if (ingredients.isEmpty()) {
             return "Não encontrei um ingrediente com o nome " + name + ".";
         }
@@ -176,12 +174,12 @@ public class AssistantService {
     }
 
     private String listIngredients() {
-        Page<Ingredient> ingredients = ingredientService.findAll(null, null, PageRequest.of(0, 10));
+        Page<br.unioeste.padaria.ingredient.model.entity.Ingrediente> ingredients = ingredienteService.findAll(null, null, PageRequest.of(0, 10));
         if (ingredients.isEmpty()) {
             return "Não há ingredientes cadastrados.";
         }
         return "Ingredientes cadastrados: " + ingredients.getContent().stream()
-                .map(Ingredient::getName)
+                .map(br.unioeste.padaria.ingredient.model.entity.Ingrediente::getName)
                 .collect(Collectors.joining(", ")) + ".";
     }
 
@@ -197,14 +195,14 @@ public class AssistantService {
     }
 
     private String formatRecipeIngredient(RecipeIngredient item) {
-        String abbreviation = item.getIngredient().getIngredientUnit().getAbbreviation();
-        return item.getIngredient().getName() + ": " + item.getQuantity()
+        String abbreviation = item.getIngrediente().getIngredientUnit().getAbbreviation();
+        return item.getIngrediente().getName() + ": " + item.getQuantity()
                 + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
     }
 
-    private String formatIngredient(Ingredient ingredient) {
-        return ingredient.getName() + ", categoria " + ingredient.getIngredientCategory().getName()
-                + ", preço por unidade R$ " + ingredient.getPricePerUnit() + ".";
+    private String formatIngredient(br.unioeste.padaria.ingredient.model.entity.Ingrediente ingrediente) {
+        return ingrediente.getName() + ", categoria " + ingrediente.getIngredientCategory().getName()
+                + ", preço por unidade R$ " + ingrediente.getPricePerUnit() + ".";
     }
 
     private String extractOutputText(JsonNode response) {

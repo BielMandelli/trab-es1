@@ -1,15 +1,15 @@
-package br.unioeste.padaria.ingredient.model.dto;
+package br.unioeste.padaria.ingrediente.model.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-public record IngredientUnitCreateDTO (
+public record CriarUnidadeIngredienteDTO(
         @NotNull
         @NotEmpty
-        String name,
+        String nomeUnidade,
         @NotNull
         @NotEmpty
-        String abbreviation
+        String abreviacaoUnidade
 ) {
 
 }

@@ -1,4 +1,4 @@
-package br.unioeste.padaria.ingredient.model.entity;
+package br.unioeste.padaria.ingrediente.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,10 +11,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ingredient_category")
-public class IngredientCategory {
+@Table(name = "unidade_ingrediente")
+public class UnidadeIngrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
+    Long idUnidadeIngrediente;
+    String nomeUnidade;
+    String abreviacaoUnidade;
 }
