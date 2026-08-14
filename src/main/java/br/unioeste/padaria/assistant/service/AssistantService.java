@@ -2,9 +2,9 @@ package br.unioeste.padaria.assistant.service;
 
 import br.unioeste.padaria.assistant.dto.AssistantIntent;
 import br.unioeste.padaria.assistant.dto.ChatResponseDTO;
-import br.unioeste.padaria.recipe.model.Recipe;
-import br.unioeste.padaria.recipe.model.RecipeIngredient;
-import br.unioeste.padaria.recipe.service.RecipeService;
+import br.unioeste.padaria.receita.model.entity.Receita;
+import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
+import br.unioeste.padaria.receita.service.ReceitaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +38,7 @@ public class AssistantService {
             Use null for data that is not present. Interpret Portuguese user messages.
             """;
 
-    private final RecipeService recipeService;
+    private final ReceitaService receitaController;
     private final br.unioeste.padaria.ingredient.service.IngredienteService ingredienteService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -138,7 +138,7 @@ public class AssistantService {
         if (name == null || name.isBlank()) {
             return "Informe o nome da receita que deseja consultar.";
         }
-        Page<Recipe> recipes = recipeService.findAll(name, PageRequest.of(0, 10));
+        Page<Receita> recipes = receitaController.findAll(name, PageRequest.of(0, 10));
         if (recipes.isEmpty()) {
             return "Não encontrei uma receita com o nome " + name + ".";
         }
@@ -149,16 +149,16 @@ public class AssistantService {
         if (id == null) {
             return "Informe o código da receita que deseja consultar.";
         }
-        return formatRecipe(recipeService.findById(id));
+        return formatRecipe(receitaController.buscarReceitaPorId(id));
     }
 
     private String listRecipes() {
-        Page<Recipe> recipes = recipeService.findAll(null, PageRequest.of(0, 10));
+        Page<Receita> recipes = receitaController.findAll(null, PageRequest.of(0, 10));
         if (recipes.isEmpty()) {
             return "Não há receitas cadastradas.";
         }
         return "Receitas cadastradas: " + recipes.getContent().stream()
-                .map(Recipe::getName)
+                .map(Receita::getName)
                 .collect(Collectors.joining(", ")) + ".";
     }
 
@@ -183,18 +183,18 @@ public class AssistantService {
                 .collect(Collectors.joining(", ")) + ".";
     }
 
-    private String formatRecipe(Recipe recipe) {
-        String ingredients = recipe.getIngredientList().isEmpty()
+    private String formatRecipe(Receita receita) {
+        String ingredients = receita.getIngredientList().isEmpty()
                 ? "Nenhum ingrediente cadastrado."
-                : recipe.getIngredientList().stream()
+                : receita.getIngredientList().stream()
                 .map(this::formatRecipeIngredient)
                 .collect(Collectors.joining(", "));
 
-        return "A receita " + recipe.getName() + " custa R$ " + recipe.getSellingPrice()
+        return "A receita " + receita.getName() + " custa R$ " + receita.getSellingPrice()
                 + " e possui os ingredientes: " + ingredients;
     }
 
-    private String formatRecipeIngredient(RecipeIngredient item) {
+    private String formatRecipeIngredient(ReceitaIngrediente item) {
         String abbreviation = item.getIngrediente().getIngredientUnit().getAbbreviation();
         return item.getIngrediente().getName() + ": " + item.getQuantity()
                 + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);

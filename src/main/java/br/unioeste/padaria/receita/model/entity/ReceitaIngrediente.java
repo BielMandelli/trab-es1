@@ -1,5 +1,6 @@
-package br.unioeste.padaria.recipe.model;
+package br.unioeste.padaria.receita.model.entity;
 
+import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,18 +20,18 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "recipe_ingredient")
-public class RecipeIngredient {
+@Table(name = "receita_ingrediente")
+public class ReceitaIngrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    Long idReceitaIngrediente;
 
     @JsonIgnore
     @ManyToOne
-    Recipe recipe;
+    Receita receita;
 
     @ManyToOne
-    br.unioeste.padaria.ingredient.model.entity.Ingrediente ingrediente;
+    Ingrediente ingrediente;
 
-    BigDecimal quantity;
+    BigDecimal quantidade;
 }
