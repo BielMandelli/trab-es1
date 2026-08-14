@@ -1,8 +1,8 @@
 package br.unioeste.padaria.assistant.controller;
 
-import br.unioeste.padaria.assistant.dto.ChatRequestDTO;
-import br.unioeste.padaria.assistant.dto.ChatResponseDTO;
-import br.unioeste.padaria.assistant.service.AssistantService;
+import br.unioeste.padaria.assistant.dto.RequisicaoChatDTO;
+import br.unioeste.padaria.assistant.dto.RespostaChatDTO;
+import br.unioeste.padaria.assistant.service.AssistenteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/assistant")
-public class AssistantController {
+@RequestMapping("/assistente")
+public class AssistenteController {
 
-    private final AssistantService assistantService;
+    private final AssistenteService assistenteService;
 
     @PostMapping("/chat")
-    public ResponseEntity<ChatResponseDTO> chat(
-            @Valid @RequestBody ChatRequestDTO dto) {
-        return ResponseEntity.ok(assistantService.chat(dto.message()));
+    public ResponseEntity<RespostaChatDTO> chat(
+            @Valid @RequestBody RequisicaoChatDTO dto) {
+        return ResponseEntity.ok(assistenteService.chat(dto.mensagem()));
     }
 }
 
