@@ -22,6 +22,7 @@ public class UnidadeService {
 
     UnidadeRepository unidadeRepository;
 
+    @Transactional
     public UnidadeMedida salvarUnidade(@Valid CriarUnidadeMedidaDTO dto) {
         UnidadeMedida unidadeMedida = new UnidadeMedida();
         unidadeMedida.setNomeUnidadeMedida(dto.nomeUnidadeMedida());
@@ -47,6 +48,7 @@ public class UnidadeService {
         return new ResponseStatusException(NOT_FOUND, entidade + " com " + id + " não encontrada");
     }
 
+    @Transactional
     public UnidadeMedida atualizarUnidadeMedida(@Valid AtualizarUnidadeMedidaDTO dto, Long idUnidadeMedida) {
         UnidadeMedida unidadeMedida = this.buscarUnidadeMedidaPorId(idUnidadeMedida);
         if(dto.nomeUnidadeMedida() != null){
@@ -55,8 +57,8 @@ public class UnidadeService {
         if(dto.abreviacao() != null){
             unidadeMedida.setAbreviacao(dto.abreviacao());
         }
-
-        return unidadeMedida;
+        
+        return unidadeRepository.save(unidadeMedida);
     }
 
     public void deletar(Long idUnidadeMedida) {
