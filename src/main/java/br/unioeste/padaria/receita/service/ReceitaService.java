@@ -107,6 +107,29 @@ public class ReceitaService {
             receita.setUnidadeMedida(this.buscarUnidadeMediaPorId(dto.idUnidadeMedida()));
         }
 
+        if(!dto.ingredientes().isEmpty()){
+            this.removerTodosReceitaIngrediente(receita.getIdReceita());
+
+            for (AtualizarReceitaIngredienteDTO criarReceitaIngredienteDTO : dto.ingredientes()) {
+
+                Ingrediente ingrediente = this.buscarIngredientePorId(criarReceitaIngredienteDTO.idIngrediente());
+
+                boolean jaAdicionado = receita.getIngredientList().stream().anyMatch(item -> item.getIngrediente().getIdIngrediente().equals(criarReceitaIngredienteDTO.idIngrediente()));
+
+                if (jaAdicionado) continue;
+
+                ReceitaIngrediente receitaIngrediente = new ReceitaIngrediente();
+
+                receitaIngrediente.setReceita(receita);
+                receitaIngrediente.setIngrediente(ingrediente);
+                receitaIngrediente.setQuantidade(criarReceitaIngredienteDTO.quantidade());
+
+                receita.getIngredientList().add(receitaIngrediente);
+            }
+        }
+
+
+
         return receitaRepository.save(receita);
     }
 
@@ -140,6 +163,15 @@ public class ReceitaService {
         receitaIngrediente.setQuantidade(dto.quantidade());
 
         return receitaIngrediente;
+    }
+
+    @Transactional
+    public void removerTodosReceitaIngrediente(Long idReceita) {
+        Receita receita = buscarReceitaPorId(idReceita);
+
+        receita.getIngredientList().clear();
+
+        receitaRepository.save(receita);
     }
 
     @Transactional
