@@ -1,6 +1,6 @@
 package br.unioeste.padaria.ingrediente.model.entity;
 
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

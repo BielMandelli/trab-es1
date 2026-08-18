@@ -1,11 +1,13 @@
 package br.unioeste.padaria.unidade.service;
 
-import br.unioeste.padaria.ingrediente.model.dto.CriarUnidadeMedidaDTO;
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.model.dto.AtualizarUnidadeMedidaDTO;
+import br.unioeste.padaria.unidade.model.dto.CriarUnidadeMedidaDTO;
+import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
 import br.unioeste.padaria.unidade.repository.UnidadeRepository;
 import br.unioeste.padaria.utils.SpecificationUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -43,5 +45,21 @@ public class UnidadeService {
 
     private ResponseStatusException naoEncontradoErro(String entidade, Long id) {
         return new ResponseStatusException(NOT_FOUND, entidade + " com " + id + " não encontrada");
+    }
+
+    public UnidadeMedida atualizarUnidadeMedida(@Valid AtualizarUnidadeMedidaDTO dto, Long idUnidadeMedida) {
+        UnidadeMedida unidadeMedida = this.buscarUnidadeMedidaPorId(idUnidadeMedida);
+        if(dto.nomeUnidadeMedida() != null){
+            unidadeMedida.setNomeUnidadeMedida(dto.nomeUnidadeMedida());
+        }
+        if(dto.abreviacao() != null){
+            unidadeMedida.setAbreviacao(dto.abreviacao());
+        }
+
+        return unidadeMedida;
+    }
+
+    public void deletar(Long idUnidadeMedida) {
+        unidadeRepository.delete(buscarUnidadeMedidaPorId(idUnidadeMedida));
     }
 }

@@ -1,4 +1,4 @@
-package br.unioeste.padaria.ingrediente.model.dto;
+package br.unioeste.padaria.unidade.model.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

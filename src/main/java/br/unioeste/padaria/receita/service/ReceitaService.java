@@ -6,7 +6,7 @@ import br.unioeste.padaria.receita.model.dto.*;
 import br.unioeste.padaria.receita.model.entity.Receita;
 import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
 import br.unioeste.padaria.receita.repository.ReceitaRepository;
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
 import br.unioeste.padaria.unidade.repository.UnidadeRepository;
 import br.unioeste.padaria.utils.SpecificationUtils;
 import jakarta.transaction.Transactional;

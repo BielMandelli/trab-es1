@@ -2,10 +2,8 @@ package br.unioeste.padaria.ingrediente.controller;
 
 import br.unioeste.padaria.ingrediente.model.dto.CriarCategoriaIngredienteDTO;
 import br.unioeste.padaria.ingrediente.model.dto.CriarIngredienteDTO;
-import br.unioeste.padaria.ingrediente.model.dto.CriarUnidadeMedidaDTO;
 import br.unioeste.padaria.ingrediente.model.entity.CategoriaIngrediente;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
 import br.unioeste.padaria.ingrediente.service.IngredienteService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,8 @@
 package br.unioeste.padaria.unidade.controller;
 
-import br.unioeste.padaria.ingrediente.model.dto.CriarUnidadeMedidaDTO;
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.model.dto.AtualizarUnidadeMedidaDTO;
+import br.unioeste.padaria.unidade.model.dto.CriarUnidadeMedidaDTO;
+import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
 import br.unioeste.padaria.unidade.service.UnidadeService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -31,8 +32,22 @@ public class UnidadeController {
     }
 
     @GetMapping("/{idUnidadeMedida}")
-    public ResponseEntity<UnidadeMedida> buscarUnidadeMedidaPorId
-            (@PathVariable Long idUnidadeMedida) {
+    public ResponseEntity<UnidadeMedida> buscarUnidadeMedidaPorId(
+            @PathVariable Long idUnidadeMedida) {
         return ResponseEntity.ok(unidadeService.buscarUnidadeMedidaPorId(idUnidadeMedida));
+    }
+
+    @PutMapping("/{idUnidadeMedida}")
+    public ResponseEntity<UnidadeMedida> atualizarUnidadeMedida(
+            @PathVariable Long idUnidadeMedida,
+            @Valid @RequestBody AtualizarUnidadeMedidaDTO dto) {
+        return ResponseEntity.ok(unidadeService.atualizarUnidadeMedida(dto, idUnidadeMedida));
+    }
+
+    @DeleteMapping("/{idUnidadeMedida}")
+    public ResponseEntity<UnidadeMedida> deletarUnidadeMedida(
+            @PathVariable Long idUnidadeMedida) {
+        unidadeService.deletar(idUnidadeMedida);
+        return ResponseEntity.noContent().build();
     }
 }

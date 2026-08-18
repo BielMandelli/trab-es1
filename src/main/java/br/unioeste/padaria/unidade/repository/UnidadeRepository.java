@@ -1,6 +1,6 @@
 package br.unioeste.padaria.unidade.repository;
 
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

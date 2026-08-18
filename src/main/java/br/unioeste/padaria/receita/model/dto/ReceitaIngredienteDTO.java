@@ -1,7 +1,7 @@
 package br.unioeste.padaria.receita.model.dto;
 
 import br.unioeste.padaria.ingrediente.model.entity.CategoriaIngrediente;
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
 
 import java.math.BigDecimal;
 

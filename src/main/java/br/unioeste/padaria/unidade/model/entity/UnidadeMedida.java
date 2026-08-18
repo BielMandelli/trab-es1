@@ -1,4 +1,4 @@
-package br.unioeste.padaria.unidade.model;
+package br.unioeste.padaria.unidade.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

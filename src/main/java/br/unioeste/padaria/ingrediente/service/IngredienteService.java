@@ -4,7 +4,7 @@ import br.unioeste.padaria.ingrediente.model.dto.CriarCategoriaIngredienteDTO;
 import br.unioeste.padaria.ingrediente.model.dto.CriarIngredienteDTO;
 import br.unioeste.padaria.ingrediente.model.entity.CategoriaIngrediente;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
-import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
 import br.unioeste.padaria.ingrediente.repository.CategoriaIngredienteRepository;
 import br.unioeste.padaria.ingrediente.repository.IngredienteRepository;
 import br.unioeste.padaria.unidade.repository.UnidadeRepository;
