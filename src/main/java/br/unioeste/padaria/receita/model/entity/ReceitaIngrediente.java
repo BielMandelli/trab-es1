@@ -1,4 +1,4 @@
-package br.unioeste.padaria.produto.model.entity;
+package br.unioeste.padaria.receita.model.entity;
 
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,15 +20,15 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "produto_ingrediente")
-public class ProdutoIngrediente {
+@Table(name = "receita_ingrediente")
+public class ReceitaIngrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long idProdutoIngrediente;
+    Long idReceitaIngrediente;
 
     @JsonIgnore
     @ManyToOne
-    Produto produto;
+    Receita receita;
 
     @ManyToOne
     Ingrediente ingrediente;

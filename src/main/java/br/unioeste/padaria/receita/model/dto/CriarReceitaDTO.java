@@ -1,4 +1,4 @@
-package br.unioeste.padaria.produto.model.dto;
+package br.unioeste.padaria.receita.model.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -8,10 +8,10 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record CriarProdutoDTO(
+public record CriarReceitaDTO(
         @NotNull
         @NotEmpty
-        String nomeProduto,
+        String nomeReceita,
         @NotNull
         @PositiveOrZero
         BigDecimal precoVenda,
@@ -21,6 +21,6 @@ public record CriarProdutoDTO(
         @NotNull
         @PositiveOrZero
         Integer tempoPreparacao,
-        List<@Valid CriarProdutoIngredienteDTO> ingredientes
+        List<@Valid CriarReceitaIngredienteDTO> ingredientes
 ) {
 }

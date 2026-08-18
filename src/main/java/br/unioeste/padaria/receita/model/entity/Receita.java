@@ -1,4 +1,4 @@
-package br.unioeste.padaria.produto.model.entity;
+package br.unioeste.padaria.receita.model.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -21,20 +21,20 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "produto")
-public class Produto {
+@Table(name = "receita")
+public class Receita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long idProduto;
+    Long idReceita;
 
-    String nomeProduto;
+    String nomeReceita;
 
-    BigDecimal custoVenda;
+    BigDecimal precoVenda;
 
     Integer rendimento;
 
     Integer tempoPreparacao;
 
-    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ProdutoIngrediente> ingredientList = new ArrayList<>();
+    @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ReceitaIngrediente> ingredientList = new ArrayList<>();
 }
