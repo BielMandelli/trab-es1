@@ -219,8 +219,8 @@ public class ReceitaService {
         return custoTotal;
     }
 
-    private BigDecimal calcularCustoPorReceita(BigDecimal custoPorUnidade, Integer rendimento){
-        return custoPorUnidade.multiply(BigDecimal.valueOf(rendimento));
+    private BigDecimal calcularCustoPorReceita(BigDecimal custoPorUnidade, BigDecimal rendimento){
+        return custoPorUnidade.multiply(rendimento);
     }
 
     public SimulacaoReceitaDTO simularReceita(@Valid CriarSimulacaoReceitaDTO dto) {
@@ -244,7 +244,7 @@ public class ReceitaService {
             BigDecimal quantidadePorLote = receitaIngrediente.getQuantidade();
             BigDecimal quantidadeNecessaria = quantidadePorLote.multiply(lotesDecimal);
 
-            BigDecimal estoqueAtual = BigDecimal.valueOf(ingrediente.getEstoqueAtual());
+            BigDecimal estoqueAtual = ingrediente.getEstoqueAtual();
             BigDecimal saldoAposProducao = estoqueAtual.subtract(quantidadeNecessaria);
 
             boolean suficiente = estoqueAtual.compareTo(quantidadeNecessaria) >= 0;

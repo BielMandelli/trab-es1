@@ -13,7 +13,7 @@ import java.util.List;
 public record ReceitaDTO(
         Long idReceita,
         String nomeReceita,
-        Integer rendimento,
+        BigDecimal rendimento,
         Integer tempoPreparo,
         List<ReceitaIngredienteDTO> ingredientes,
         BigDecimal custoPorUnidade,

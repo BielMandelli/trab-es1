@@ -2,6 +2,7 @@ package br.unioeste.padaria.ingrediente.controller;
 
 import br.unioeste.padaria.ingrediente.model.dto.CriarCategoriaIngredienteDTO;
 import br.unioeste.padaria.ingrediente.model.dto.CriarIngredienteDTO;
+import br.unioeste.padaria.ingrediente.model.dto.IngredienteInfoDTO;
 import br.unioeste.padaria.ingrediente.model.entity.CategoriaIngrediente;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import br.unioeste.padaria.ingrediente.service.IngredienteService;
@@ -58,4 +59,8 @@ public class IngredienteController {
         return ResponseEntity.ok(ingredienteService.buscarCategoriaIngredientePorId(id));
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<IngredienteInfoDTO> buscarInformacoesGerais(){
+        return ResponseEntity.ok(ingredienteService.buscarInformacoesGerais());
+    }
 }

@@ -19,10 +19,10 @@ public record CriarIngredienteDTO(
         @DecimalMin(value = "0.0", inclusive = false)
         BigDecimal custoPorUnidade,
         @NotNull
-        @PositiveOrZero
-        Integer estoqueAtual,
+        @DecimalMin(value = "0.0", inclusive = false)
+        BigDecimal estoqueAtual,
         @NotNull
-        @PositiveOrZero
-        Integer estoqueMinimo
+        @DecimalMin(value = "0.0", inclusive = false)
+        BigDecimal estoqueMinimo
 ) {
 }

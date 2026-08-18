@@ -11,7 +11,7 @@ public record ReceitaIngredienteDTO(
         CategoriaIngrediente categoriaIngrediente,
         UnidadeMedida unidadeMedida,
         BigDecimal custoPorUnidade,
-        Integer estoqueAtual,
+        BigDecimal estoqueAtual,
         BigDecimal quantidade
 ) {
 }

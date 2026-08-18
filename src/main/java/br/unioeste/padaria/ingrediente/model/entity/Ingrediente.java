@@ -25,6 +25,6 @@ public class Ingrediente {
     @ManyToOne
     UnidadeMedida unidadeMedida;
     BigDecimal custoPorUnidade;
-    Integer estoqueAtual;
-    Integer estoqueMinimo;
+    BigDecimal estoqueAtual;
+    BigDecimal estoqueMinimo;
 }

@@ -2,6 +2,7 @@ package br.unioeste.padaria.ingrediente.service;
 
 import br.unioeste.padaria.ingrediente.model.dto.CriarCategoriaIngredienteDTO;
 import br.unioeste.padaria.ingrediente.model.dto.CriarIngredienteDTO;
+import br.unioeste.padaria.ingrediente.model.dto.IngredienteInfoDTO;
 import br.unioeste.padaria.ingrediente.model.entity.CategoriaIngrediente;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import br.unioeste.padaria.unidade.model.entity.UnidadeMedida;
@@ -11,11 +12,15 @@ import br.unioeste.padaria.unidade.repository.UnidadeRepository;
 import br.unioeste.padaria.utils.SpecificationUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -88,6 +93,25 @@ public class IngredienteService {
 
     private ResponseStatusException naoEncontradoErro(String entidade, Long id) {
         return new ResponseStatusException(NOT_FOUND, entidade + " com " + id + " não encontrada");
+    }
+
+    public IngredienteInfoDTO buscarInformacoesGerais() {
+        List<Ingrediente> ingredientes = ingredienteRepository.findAll();
+
+        Integer estoqueBaixo = 0;
+        BigDecimal valorTotalEstoque = BigDecimal.ZERO;
+        for(Ingrediente ingrediente : ingredientes){
+            if (ingrediente.getEstoqueAtual().compareTo(ingrediente.getEstoqueMinimo()) <= 0) estoqueBaixo++;
+
+            BigDecimal custoPorUnidade = ingrediente.getCustoPorUnidade();
+            BigDecimal estoqueAtual = ingrediente.getEstoqueAtual();
+            valorTotalEstoque = valorTotalEstoque.add(custoPorUnidade.multiply(estoqueAtual));
+        }
+
+        return new IngredienteInfoDTO(
+                estoqueBaixo,
+                valorTotalEstoque
+        );
     }
 }
 

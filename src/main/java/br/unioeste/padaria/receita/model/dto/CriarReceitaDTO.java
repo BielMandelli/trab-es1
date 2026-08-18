@@ -1,10 +1,7 @@
 package br.unioeste.padaria.receita.model.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,8 +11,8 @@ public record CriarReceitaDTO(
         @NotEmpty
         String nomeReceita,
         @NotNull
-        @PositiveOrZero
-        Integer rendimento,
+        @DecimalMin(value = "0.0", inclusive = false)
+        BigDecimal rendimento,
         @NotNull
         Long idUnidadeMedida,
         @NotNull
