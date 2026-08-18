@@ -145,7 +145,7 @@ public class AssistenteService {
     private String encontrarReceitaPeloId(Long idReceita) {
         if (idReceita == null) return "Informe o código da receita que deseja consultar.";
 
-        return formatarReceita(receitaService.buscarReceitaPorId(idReceita));
+        return formatarReceitaDTO(receitaService.formatarReceita(receitaService.buscarReceitaPorId(idReceita)));
     }
 
     private String listarReceitas() {
@@ -176,17 +176,6 @@ public class AssistenteService {
                 .collect(Collectors.joining(", ")) + ".";
     }
 
-    private String formatarReceita(Receita receita) {
-        String ingredients = receita.getIngredientList().isEmpty()
-                ? "Nenhum ingrediente cadastrado."
-                : receita.getIngredientList().stream()
-                .map(this::formatarReceitaIngrediente)
-                .collect(Collectors.joining(", "));
-
-        return "A receita " + receita.getNomeReceita() + " custa R$ " + receita.getPrecoVenda()
-                + " e possui os ingredientes: " + ingredients;
-    }
-
     private String formatarReceitaDTO(ReceitaDTO receitaDTO) {
         String ingredients = receitaDTO.ingredientes().isEmpty()
                 ? "Nenhum ingrediente cadastrado."
@@ -194,25 +183,25 @@ public class AssistenteService {
                 .map(this::formatarReceitaIngrediente)
                 .collect(Collectors.joining(", "));
 
-        return "A receita " + receitaDTO.nomeReceita() + " custa R$ " + receitaDTO.precoVenda()
+        return "A receita " + receitaDTO.nomeReceita() + " custa R$ " + receitaDTO.custoPorReceita()
                 + " e possui os ingredientes: " + ingredients;
     }
 
     private String formatarReceitaIngrediente(ReceitaIngrediente receitaIngredienteDTO) {
-        String abbreviation = receitaIngredienteDTO.getIngrediente().getUnidadeIngrediente().getAbreviacaoUnidade();
+        String abbreviation = receitaIngredienteDTO.getIngrediente().getUnidadeMedida().getAbreviacao();
         return receitaIngredienteDTO.getIngrediente().getNomeIngrediente() + ": " + receitaIngredienteDTO.getQuantidade()
                 + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
     }
 
     private String formatarReceitaIngrediente(ReceitaIngredienteDTO receitaIngredienteDTO) {
-        String abbreviation = receitaIngredienteDTO.unidadeIngrediente().getAbreviacaoUnidade();
+        String abbreviation = receitaIngredienteDTO.unidadeMedida().getAbreviacao();
         return receitaIngredienteDTO.nomeIngrediente() + ": " + receitaIngredienteDTO.quantidade()
                 + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
     }
 
     private String formatarIngrediente(Ingrediente ingrediente) {
         return ingrediente.getNomeIngrediente() + ", categoria " + ingrediente.getCategoriaIngrediente().getNomeCategoria()
-                + ", preço por unidade R$ " + ingrediente.getPrecoPorUnidade() + ".";
+                + ", preço por unidade R$ " + ingrediente.getCustoPorUnidade() + ".";
     }
 
     private String extrairTexto(JsonNode response) {

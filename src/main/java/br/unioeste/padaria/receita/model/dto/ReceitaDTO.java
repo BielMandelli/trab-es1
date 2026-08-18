@@ -14,7 +14,7 @@ public record ReceitaDTO(
         Long idReceita,
         String nomeReceita,
         Integer rendimento,
-        Integer tempoPreparacao,
+        Integer tempoPreparo,
         List<ReceitaIngredienteDTO> ingredientes,
         BigDecimal custoPorUnidade,
         BigDecimal custoPorReceita

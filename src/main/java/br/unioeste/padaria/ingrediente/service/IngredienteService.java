@@ -2,16 +2,15 @@ package br.unioeste.padaria.ingrediente.service;
 
 import br.unioeste.padaria.ingrediente.model.dto.CriarCategoriaIngredienteDTO;
 import br.unioeste.padaria.ingrediente.model.dto.CriarIngredienteDTO;
-import br.unioeste.padaria.ingrediente.model.dto.CriarUnidadeIngredienteDTO;
 import br.unioeste.padaria.ingrediente.model.entity.CategoriaIngrediente;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
-import br.unioeste.padaria.ingrediente.model.entity.UnidadeIngrediente;
+import br.unioeste.padaria.unidade.model.UnidadeMedida;
 import br.unioeste.padaria.ingrediente.repository.CategoriaIngredienteRepository;
 import br.unioeste.padaria.ingrediente.repository.IngredienteRepository;
-import br.unioeste.padaria.ingrediente.repository.UnidadeIngredienteRepository;
+import br.unioeste.padaria.unidade.repository.UnidadeRepository;
 import br.unioeste.padaria.utils.SpecificationUtils;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,19 +20,13 @@ import org.springframework.web.server.ResponseStatusException;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class IngredienteService {
 
     private final IngredienteRepository ingredienteRepository;
     private final CategoriaIngredienteRepository categoriaIngredienteRepository;
-    private final UnidadeIngredienteRepository unidadeIngredienteRepository;
+    private final UnidadeRepository unidadeRepository;
 
-    public UnidadeIngrediente salvarUnidade(@Valid CriarUnidadeIngredienteDTO dto) {
-        UnidadeIngrediente unidadeIngrediente = new UnidadeIngrediente();
-        unidadeIngrediente.setNomeUnidade(dto.nomeUnidade());
-        unidadeIngrediente.setAbreviacaoUnidade(dto.abreviacaoUnidade());
-        return unidadeIngredienteRepository.save(unidadeIngrediente);
-    }
 
     public CategoriaIngrediente salvarCategoria(@Valid CriarCategoriaIngredienteDTO dto) {
         CategoriaIngrediente categoriaIngrediente = new CategoriaIngrediente();
@@ -44,13 +37,13 @@ public class IngredienteService {
     public Ingrediente salvarIngrediente(@Valid CriarIngredienteDTO dto) {
         Ingrediente ingrediente = new Ingrediente();
 
-        UnidadeIngrediente unidadeIngrediente = this.buscarUnidadeIngredientePorId(dto.idUnidadeIngrediente());
+        UnidadeMedida unidadeMedida = this.buscarUnidadeMedidaPorId(dto.idUnidadeMedida());
         CategoriaIngrediente categoriaIngrediente = this.buscarCategoriaIngredientePorId(dto.idCategoriaIngrediente());
 
         ingrediente.setNomeIngrediente(dto.nomeIngrediente());
         ingrediente.setCategoriaIngrediente(categoriaIngrediente);
-        ingrediente.setUnidadeIngrediente(unidadeIngrediente);
-        ingrediente.setPrecoPorUnidade(dto.precoPorUnidade());
+        ingrediente.setUnidadeMedida(unidadeMedida);
+        ingrediente.setCustoPorUnidade(dto.custoPorUnidade());
         ingrediente.setEstoqueAtual(dto.estoqueAtual());
         ingrediente.setEstoqueMinimo(dto.estoqueMinimo());
 
@@ -81,16 +74,6 @@ public class IngredienteService {
         return categoriaIngredienteRepository.findAll(specification, pageable);
     }
 
-    public Page<UnidadeIngrediente> listarTodasUnidadesIngrediente(String nomeUnidadeIngrediente, Pageable pageable) {
-        Specification<UnidadeIngrediente> specification = Specification.allOf();
-
-        if (nomeUnidadeIngrediente != null && !nomeUnidadeIngrediente.isBlank()) {
-            specification = specification.and(SpecificationUtils.containsIgnoreCase("nomeUnidade", nomeUnidadeIngrediente));
-        }
-
-        return unidadeIngredienteRepository.findAll(specification, pageable);
-    }
-
     public Ingrediente buscarIngredientePorId(Long idIngrediente) {
         return ingredienteRepository.findById(idIngrediente).orElseThrow(() -> naoEncontradoErro("Ingrediente", idIngrediente));
     }
@@ -99,8 +82,8 @@ public class IngredienteService {
         return categoriaIngredienteRepository.findById(idCategoriaIngrediente).orElseThrow(() -> naoEncontradoErro("CategoriaIngrediente", idCategoriaIngrediente));
     }
 
-    public UnidadeIngrediente buscarUnidadeIngredientePorId(Long idUnidadeIngrediente) {
-        return unidadeIngredienteRepository.findById(idUnidadeIngrediente).orElseThrow(() -> naoEncontradoErro("UnidadeIngrediente", idUnidadeIngrediente));
+    public UnidadeMedida buscarUnidadeMedidaPorId(Long idUnidadeMedida) {
+        return unidadeRepository.findById(idUnidadeMedida).orElseThrow(() -> naoEncontradoErro("UnidadeIngrediente", idUnidadeMedida));
     }
 
     private ResponseStatusException naoEncontradoErro(String entidade, Long id) {

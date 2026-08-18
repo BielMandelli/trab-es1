@@ -1,4 +1,4 @@
-package br.unioeste.padaria.ingrediente.model.entity;
+package br.unioeste.padaria.unidade.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,11 +11,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "unidade_ingrediente")
-public class UnidadeIngrediente {
+@Table(name = "unidade_medida")
+public class UnidadeMedida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long idUnidadeIngrediente;
-    String nomeUnidade;
-    String abreviacaoUnidade;
+    Long idUnidadeMedida;
+    String nomeUnidadeMedida;
+    String abreviacao;
 }

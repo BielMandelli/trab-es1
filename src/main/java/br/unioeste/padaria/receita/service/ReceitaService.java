@@ -6,10 +6,12 @@ import br.unioeste.padaria.receita.model.dto.*;
 import br.unioeste.padaria.receita.model.entity.Receita;
 import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
 import br.unioeste.padaria.receita.repository.ReceitaRepository;
+import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import br.unioeste.padaria.unidade.repository.UnidadeRepository;
 import br.unioeste.padaria.utils.SpecificationUtils;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,19 +26,22 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ReceitaService {
 
     private final ReceitaRepository receitaRepository;
     private final IngredienteRepository ingredienteRepository;
+    private final UnidadeRepository unidadeRepository;
 
     @Transactional
     public Receita salvarReceita(@Valid CriarReceitaDTO dto) {
         Receita receita = new Receita();
 
         receita.setNomeReceita(dto.nomeReceita());
+        receita.setValidade(dto.validade());
         receita.setRendimento(dto.rendimento());
-        receita.setTempoPreparacao(dto.tempoPreparacao());
+        receita.setTempoPreparo(dto.tempoPreparo());
+        receita.setUnidadeMedida(this.buscarUnidadeMediaPorId(dto.idUnidadeMedida()));
 
         for (CriarReceitaIngredienteDTO criarReceitaIngredienteDTO : dto.ingredientes()) {
 
@@ -78,6 +83,10 @@ public class ReceitaService {
         return ingredienteRepository.findById(idIngrediente).orElseThrow(() -> naoEncontradoErro("Ingrediente", idIngrediente));
     }
 
+    public UnidadeMedida buscarUnidadeMediaPorId(Long idUnidadeMedida) {
+        return unidadeRepository.findById(idUnidadeMedida).orElseThrow(() -> naoEncontradoErro("Unidade de Medida", idUnidadeMedida));
+    }
+
     @Transactional
     public Receita atualizarReceita(Long idReceita, @Valid AtualizarReceitaDTO dto) {
         Receita receita = this.buscarReceitaPorId(idReceita);
@@ -88,8 +97,14 @@ public class ReceitaService {
         if (dto.rendimento() != null) {
             receita.setRendimento(dto.rendimento());
         }
-        if (dto.tempoPreparacao() != null) {
-            receita.setTempoPreparacao(dto.tempoPreparacao());
+        if (dto.tempoPreparo() != null) {
+            receita.setTempoPreparo(dto.tempoPreparo());
+        }
+        if(dto.validade() != null){
+            receita.setValidade(dto.validade());
+        }
+        if(dto.idUnidadeMedida() != null){
+            receita.setUnidadeMedida(this.buscarUnidadeMediaPorId(dto.idUnidadeMedida()));
         }
 
         return receitaRepository.save(receita);
@@ -168,7 +183,7 @@ public class ReceitaService {
                             ingrediente.getIdIngrediente(),
                             ingrediente.getNomeIngrediente(),
                             ingrediente.getCategoriaIngrediente(),
-                            ingrediente.getUnidadeIngrediente(),
+                            ingrediente.getUnidadeMedida(),
                             ingrediente.getCustoPorUnidade(),
                             ingrediente.getEstoqueAtual(),
                             receitaIngrediente.getQuantidade()
@@ -183,7 +198,7 @@ public class ReceitaService {
                 receita.getIdReceita(),
                 receita.getNomeReceita(),
                 receita.getRendimento(),
-                receita.getTempoPreparacao(),
+                receita.getTempoPreparo(),
                 ingredienteList,
                 custoPorUnidade,
                 custoPorReceita
@@ -248,7 +263,7 @@ public class ReceitaService {
                             ingrediente.getIdIngrediente(),
                             ingrediente.getNomeIngrediente(),
                             ingrediente.getCategoriaIngrediente(),
-                            ingrediente.getUnidadeIngrediente(),
+                            ingrediente.getUnidadeMedida(),
                             quantidadeNecessaria,
                             estoqueAtual,
                             saldoAposProducao,
@@ -260,6 +275,7 @@ public class ReceitaService {
         return new SimulacaoReceitaDTO(
                 receita.getIdReceita(),
                 receita.getNomeReceita(),
+                receita.getUnidadeMedida(),
                 dto.lotes(),
                 custoTotal,
                 maximoLotes,

@@ -1,5 +1,6 @@
 package br.unioeste.padaria.receita.model.dto;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
@@ -9,6 +10,9 @@ public record AtualizarReceitaDTO(
         @PositiveOrZero
         Integer rendimento,
         @PositiveOrZero
-        Integer tempoPreparacao
+        Integer tempoPreparo,
+        @PositiveOrZero
+        Integer validade,
+        Long idUnidadeMedida
 ) {
 }

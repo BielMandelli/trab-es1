@@ -1,18 +1,12 @@
 package br.unioeste.padaria.receita.model.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import br.unioeste.padaria.unidade.model.UnidadeMedida;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +25,12 @@ public class Receita {
 
     Integer rendimento;
 
-    Integer tempoPreparacao;
+    Integer tempoPreparo;
+
+    Integer validade;
+
+    @ManyToOne
+    UnidadeMedida unidadeMedida;
 
     @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ReceitaIngrediente> ingredientList = new ArrayList<>();

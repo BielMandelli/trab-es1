@@ -3,13 +3,13 @@ package br.unioeste.padaria.ingrediente.model.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-public record CriarUnidadeIngredienteDTO(
+public record CriarUnidadeMedidaDTO(
         @NotNull
         @NotEmpty
-        String nomeUnidade,
+        String nomeUnidadeMedida,
         @NotNull
         @NotEmpty
-        String abreviacaoUnidade
+        String abreviacao
 ) {
 
 }

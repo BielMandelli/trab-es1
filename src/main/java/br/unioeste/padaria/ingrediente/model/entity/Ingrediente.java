@@ -1,5 +1,6 @@
 package br.unioeste.padaria.ingrediente.model.entity;
 
+import br.unioeste.padaria.unidade.model.UnidadeMedida;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class Ingrediente {
     @ManyToOne
     CategoriaIngrediente categoriaIngrediente;
     @ManyToOne
-    UnidadeIngrediente unidadeIngrediente;
+    UnidadeMedida unidadeMedida;
     BigDecimal custoPorUnidade;
     Integer estoqueAtual;
     Integer estoqueMinimo;
