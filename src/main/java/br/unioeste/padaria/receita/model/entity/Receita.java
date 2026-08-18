@@ -29,8 +29,6 @@ public class Receita {
 
     String nomeReceita;
 
-    BigDecimal precoVenda;
-
     Integer rendimento;
 
     Integer tempoPreparacao;

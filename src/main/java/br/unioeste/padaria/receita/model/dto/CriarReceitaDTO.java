@@ -14,9 +14,6 @@ public record CriarReceitaDTO(
         String nomeReceita,
         @NotNull
         @PositiveOrZero
-        BigDecimal precoVenda,
-        @NotNull
-        @PositiveOrZero
         Integer rendimento,
         @NotNull
         @PositiveOrZero

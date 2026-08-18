@@ -35,7 +35,6 @@ public class ReceitaService {
         Receita receita = new Receita();
 
         receita.setNomeReceita(dto.nomeReceita());
-        receita.setPrecoVenda(dto.precoVenda());
         receita.setRendimento(dto.rendimento());
         receita.setTempoPreparacao(dto.tempoPreparacao());
 
@@ -85,9 +84,6 @@ public class ReceitaService {
 
         if (dto.nomeReceita() != null) {
             receita.setNomeReceita(dto.nomeReceita());
-        }
-        if (dto.precoVenda() != null) {
-            receita.setPrecoVenda(dto.precoVenda());
         }
         if (dto.rendimento() != null) {
             receita.setRendimento(dto.rendimento());
@@ -173,33 +169,32 @@ public class ReceitaService {
                             ingrediente.getNomeIngrediente(),
                             ingrediente.getCategoriaIngrediente(),
                             ingrediente.getUnidadeIngrediente(),
-                            ingrediente.getPrecoPorUnidade(),
+                            ingrediente.getCustoPorUnidade(),
                             ingrediente.getEstoqueAtual(),
                             receitaIngrediente.getQuantidade()
                     );
                 })
                 .toList();
 
-        BigDecimal precoPorUnidade = calcularPrecoPorUnidade(receita.getIngredientList());
-        BigDecimal precoPorReceita = calcularPrecoPorReceita(precoPorUnidade, receita.getRendimento());
+        BigDecimal custoPorUnidade = calcularCustoPorUnidade(receita.getIngredientList());
+        BigDecimal custoPorReceita = calcularCustoPorReceita(custoPorUnidade, receita.getRendimento());
 
         return new ReceitaDTO(
                 receita.getIdReceita(),
                 receita.getNomeReceita(),
-                receita.getPrecoVenda(),
                 receita.getRendimento(),
                 receita.getTempoPreparacao(),
                 ingredienteList,
-                precoPorUnidade,
-                precoPorReceita
+                custoPorUnidade,
+                custoPorReceita
         );
     }
 
-    private BigDecimal calcularPrecoPorUnidade(List<ReceitaIngrediente> ingredienteList){
+    private BigDecimal calcularCustoPorUnidade(List<ReceitaIngrediente> ingredienteList){
         BigDecimal custoTotal = BigDecimal.ZERO;
 
         for (ReceitaIngrediente receitaIngrediente : ingredienteList){
-            BigDecimal valorUnidade = receitaIngrediente.getIngrediente().getPrecoPorUnidade();
+            BigDecimal valorUnidade = receitaIngrediente.getIngrediente().getCustoPorUnidade();
             BigDecimal quantidade = receitaIngrediente.getQuantidade();
 
             BigDecimal custoIngrediente = valorUnidade.multiply(quantidade);
@@ -209,8 +204,8 @@ public class ReceitaService {
         return custoTotal;
     }
 
-    private BigDecimal calcularPrecoPorReceita(BigDecimal precoPorUnidade, Integer rendimento){
-        return precoPorUnidade.multiply(BigDecimal.valueOf(rendimento));
+    private BigDecimal calcularCustoPorReceita(BigDecimal custoPorUnidade, Integer rendimento){
+        return custoPorUnidade.multiply(BigDecimal.valueOf(rendimento));
     }
 
     public SimulacaoReceitaDTO simularReceita(@Valid CriarSimulacaoReceitaDTO dto) {
@@ -245,12 +240,15 @@ public class ReceitaService {
 
             maximoLotes = Math.min(maximoLotes, lotesPossiveis);
 
-            BigDecimal custoIngrediente = ingrediente.getPrecoPorUnidade().multiply(quantidadeNecessaria);
+            BigDecimal custoIngrediente = ingrediente.getCustoPorUnidade().multiply(quantidadeNecessaria);
             custoTotal = custoTotal.add(custoIngrediente);
 
             ingredientes.add(
                     new SimulacaoIngredienteDTO(
+                            ingrediente.getIdIngrediente(),
                             ingrediente.getNomeIngrediente(),
+                            ingrediente.getCategoriaIngrediente(),
+                            ingrediente.getUnidadeIngrediente(),
                             quantidadeNecessaria,
                             estoqueAtual,
                             saldoAposProducao,

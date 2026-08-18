@@ -23,7 +23,7 @@ public class Ingrediente {
     CategoriaIngrediente categoriaIngrediente;
     @ManyToOne
     UnidadeIngrediente unidadeIngrediente;
-    BigDecimal precoPorUnidade;
+    BigDecimal custoPorUnidade;
     Integer estoqueAtual;
     Integer estoqueMinimo;
 }

@@ -10,7 +10,7 @@ public record ReceitaIngredienteDTO(
         String nomeIngrediente,
         CategoriaIngrediente categoriaIngrediente,
         UnidadeIngrediente unidadeIngrediente,
-        BigDecimal precoPorUnidade,
+        BigDecimal custoPorUnidade,
         Integer estoqueAtual,
         BigDecimal quantidade
 ) {

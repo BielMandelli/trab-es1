@@ -17,7 +17,7 @@ public record CriarIngredienteDTO(
         Long idUnidadeIngrediente,
         @NotNull
         @DecimalMin(value = "0.0", inclusive = false)
-        BigDecimal precoPorUnidade,
+        BigDecimal custoPorUnidade,
         @NotNull
         @PositiveOrZero
         Integer estoqueAtual,

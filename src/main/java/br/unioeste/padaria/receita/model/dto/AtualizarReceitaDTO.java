@@ -7,8 +7,6 @@ import java.math.BigDecimal;
 public record AtualizarReceitaDTO(
         String nomeReceita,
         @PositiveOrZero
-        BigDecimal precoVenda,
-        @PositiveOrZero
         Integer rendimento,
         @PositiveOrZero
         Integer tempoPreparacao
