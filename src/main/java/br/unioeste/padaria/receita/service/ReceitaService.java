@@ -230,6 +230,8 @@ public class ReceitaService {
                 receita.getIdReceita(),
                 receita.getNomeReceita(),
                 receita.getRendimento(),
+                receita.getValidade(),
+                receita.getUnidadeMedida(),
                 receita.getTempoPreparo(),
                 ingredienteList,
                 custoPorUnidade,
