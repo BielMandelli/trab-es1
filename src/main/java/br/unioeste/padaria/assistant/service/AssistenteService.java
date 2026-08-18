@@ -4,11 +4,11 @@ import br.unioeste.padaria.assistant.dto.IntencaoAssistenteDTO;
 import br.unioeste.padaria.assistant.dto.RespostaChatDTO;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import br.unioeste.padaria.ingrediente.service.IngredienteService;
-import br.unioeste.padaria.receita.model.dto.ReceitaDTO;
-import br.unioeste.padaria.receita.model.dto.ReceitaIngredienteDTO;
-import br.unioeste.padaria.receita.model.entity.Receita;
-import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
-import br.unioeste.padaria.receita.service.ReceitaService;
+import br.unioeste.padaria.produto.model.dto.ProdutoDTO;
+import br.unioeste.padaria.produto.model.dto.ProdutoIngredienteDTO;
+import br.unioeste.padaria.produto.model.entity.Produto;
+import br.unioeste.padaria.produto.model.entity.ProdutoIngrediente;
+import br.unioeste.padaria.produto.service.ProdutoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +43,7 @@ public class AssistenteService {
             """;
     private static final String URL_IA = "https://generativelanguage.googleapis.com";
 
-    private final ReceitaService receitaService;
+    private final ProdutoService produtoService;
     private final IngredienteService ingredienteService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -135,7 +135,7 @@ public class AssistenteService {
     private String encontrarReceitaPeloNome(String nomeReceita) {
         if (nomeReceita == null || nomeReceita.isBlank()) return "Informe o nome da receita que deseja consultar.";
 
-        Page<ReceitaDTO> recipes = receitaService.listarTodasReceitas(nomeReceita, PageRequest.of(0, 10));
+        Page<ProdutoDTO> recipes = produtoService.listarTodosProdutos(nomeReceita, PageRequest.of(0, 10));
 
         if (recipes.isEmpty()) return "Não encontrei uma receita com o nome " + nomeReceita + ".";
 
@@ -145,15 +145,15 @@ public class AssistenteService {
     private String encontrarReceitaPeloId(Long idReceita) {
         if (idReceita == null) return "Informe o código da receita que deseja consultar.";
 
-        return formatarReceita(receitaService.buscarReceitaPorId(idReceita));
+        return formatarReceita(produtoService.buscarProdutoPorId(idReceita));
     }
 
     private String listarReceitas() {
-        Page<ReceitaDTO> recipes = receitaService.listarTodasReceitas(null, PageRequest.of(0, 10));
+        Page<ProdutoDTO> recipes = produtoService.listarTodosProdutos(null, PageRequest.of(0, 10));
 
         if (recipes.isEmpty()) return "Não há receitas cadastradas.";
 
-        return "Receitas cadastradas: " + recipes.getContent().stream().map(ReceitaDTO::nomeReceita).collect(Collectors.joining(", ")) + ".";
+        return "Receitas cadastradas: " + recipes.getContent().stream().map(ProdutoDTO::nomeReceita).collect(Collectors.joining(", ")) + ".";
     }
 
     private String encontrarIngredientePeloNome(String nomeIngrediente) {
@@ -176,37 +176,37 @@ public class AssistenteService {
                 .collect(Collectors.joining(", ")) + ".";
     }
 
-    private String formatarReceita(Receita receita) {
-        String ingredients = receita.getIngredientList().isEmpty()
+    private String formatarReceita(Produto produto) {
+        String ingredients = produto.getIngredientList().isEmpty()
                 ? "Nenhum ingrediente cadastrado."
-                : receita.getIngredientList().stream()
+                : produto.getIngredientList().stream()
                 .map(this::formatarReceitaIngrediente)
                 .collect(Collectors.joining(", "));
 
-        return "A receita " + receita.getNomeReceita() + " custa R$ " + receita.getPrecoVenda()
+        return "A receita " + produto.getNomeProduto() + " custa R$ " + produto.getCustoVenda()
                 + " e possui os ingredientes: " + ingredients;
     }
 
-    private String formatarReceitaDTO(ReceitaDTO receitaDTO) {
-        String ingredients = receitaDTO.ingredientes().isEmpty()
+    private String formatarReceitaDTO(ProdutoDTO produtoDTO) {
+        String ingredients = produtoDTO.ingredientes().isEmpty()
                 ? "Nenhum ingrediente cadastrado."
-                : receitaDTO.ingredientes().stream()
+                : produtoDTO.ingredientes().stream()
                 .map(this::formatarReceitaIngrediente)
                 .collect(Collectors.joining(", "));
 
-        return "A receita " + receitaDTO.nomeReceita() + " custa R$ " + receitaDTO.precoVenda()
+        return "A receita " + produtoDTO.nomeReceita() + " custa R$ " + produtoDTO.precoVenda()
                 + " e possui os ingredientes: " + ingredients;
     }
 
-    private String formatarReceitaIngrediente(ReceitaIngrediente receitaIngredienteDTO) {
-        String abbreviation = receitaIngredienteDTO.getIngrediente().getUnidadeIngrediente().getAbreviacaoUnidade();
-        return receitaIngredienteDTO.getIngrediente().getNomeIngrediente() + ": " + receitaIngredienteDTO.getQuantidade()
+    private String formatarReceitaIngrediente(ProdutoIngrediente produtoIngredienteDTO) {
+        String abbreviation = produtoIngredienteDTO.getIngrediente().getUnidadeIngrediente().getAbreviacaoUnidade();
+        return produtoIngredienteDTO.getIngrediente().getNomeIngrediente() + ": " + produtoIngredienteDTO.getQuantidade()
                 + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
     }
 
-    private String formatarReceitaIngrediente(ReceitaIngredienteDTO receitaIngredienteDTO) {
-        String abbreviation = receitaIngredienteDTO.unidadeIngrediente().getAbreviacaoUnidade();
-        return receitaIngredienteDTO.nomeIngrediente() + ": " + receitaIngredienteDTO.quantidade()
+    private String formatarReceitaIngrediente(ProdutoIngredienteDTO produtoIngredienteDTO) {
+        String abbreviation = produtoIngredienteDTO.unidadeIngrediente().getAbreviacaoUnidade();
+        return produtoIngredienteDTO.nomeIngrediente() + ": " + produtoIngredienteDTO.quantidade()
                 + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
     }
 

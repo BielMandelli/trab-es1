@@ -1,13 +1,13 @@
-package br.unioeste.padaria.receita.model.dto;
+package br.unioeste.padaria.produto.model.dto;
 
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
-public record AtualizarReceitaDTO(
-        String nomeReceita,
+public record AtualizarProdutoDTO(
+        String nomeProduto,
         @PositiveOrZero
-        BigDecimal precoVenda,
+        BigDecimal custoVenda,
         @PositiveOrZero
         Integer rendimento,
         @PositiveOrZero

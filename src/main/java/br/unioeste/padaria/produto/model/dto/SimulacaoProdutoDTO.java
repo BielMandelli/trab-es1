@@ -1,11 +1,11 @@
-package br.unioeste.padaria.receita.model.dto;
+package br.unioeste.padaria.produto.model.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public record SimulacaoReceitaDTO(
-        Long idReceita,
-        String nomeReceita,
+public record SimulacaoProdutoDTO(
+        Long idProduto,
+        String nomeProduto,
         Integer lotes,
         BigDecimal custoEstimado,
         Integer maximoLotesPossivel,
