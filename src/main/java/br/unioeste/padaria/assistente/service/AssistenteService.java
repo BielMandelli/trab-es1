@@ -1,13 +1,11 @@
-package br.unioeste.padaria.assistant.service;
+package br.unioeste.padaria.assistente.service;
 
-import br.unioeste.padaria.assistant.dto.IntencaoAssistenteDTO;
-import br.unioeste.padaria.assistant.dto.RespostaChatDTO;
+import br.unioeste.padaria.assistente.dto.IntencaoAssistenteDTO;
+import br.unioeste.padaria.assistente.dto.RespostaChatDTO;
 import br.unioeste.padaria.ingrediente.model.entity.Ingrediente;
 import br.unioeste.padaria.ingrediente.service.IngredienteService;
 import br.unioeste.padaria.receita.model.dto.ReceitaDTO;
 import br.unioeste.padaria.receita.model.dto.ReceitaIngredienteDTO;
-import br.unioeste.padaria.receita.model.entity.Receita;
-import br.unioeste.padaria.receita.model.entity.ReceitaIngrediente;
 import br.unioeste.padaria.receita.service.ReceitaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,6 +22,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
@@ -46,7 +46,6 @@ public class AssistenteService {
     private final ReceitaService receitaService;
     private final IngredienteService ingredienteService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     private final RestClient restClient = RestClient.builder().baseUrl(URL_IA).build();
 
     @Value("${gemini.api-key}")
@@ -149,11 +148,23 @@ public class AssistenteService {
     }
 
     private String listarReceitas() {
-        Page<ReceitaDTO> recipes = receitaService.listarTodasReceitas(null, PageRequest.of(0, 10));
+        Page<ReceitaDTO> receitas =
+                receitaService.listarTodasReceitas(null, PageRequest.of(0, 10));
 
-        if (recipes.isEmpty()) return "Não há receitas cadastradas.";
+        if (receitas.isEmpty()) {
+            return "Não há receitas cadastradas.";
+        }
 
-        return "Receitas cadastradas: " + recipes.getContent().stream().map(ReceitaDTO::nomeReceita).collect(Collectors.joining(", ")) + ".";
+        String lista = receitas.getContent().stream()
+                .map(ReceitaDTO::nomeReceita)
+                .map(nome -> "• " + nome)
+                .collect(Collectors.joining("\n"));
+
+        return """
+            Receitas cadastradas
+
+            %s
+            """.formatted(lista).trim();
     }
 
     private String encontrarIngredientePeloNome(String nomeIngrediente) {
@@ -167,41 +178,85 @@ public class AssistenteService {
     }
 
     private String listarIngredientes() {
-        Page<Ingrediente> ingredients = ingredienteService.listarTodosIngredientes(null, null, PageRequest.of(0, 10));
+        Page<Ingrediente> ingredientes =
+                ingredienteService.listarTodosIngredientes(
+                        null,
+                        null,
+                        PageRequest.of(0, 10)
+                );
 
-        if (ingredients.isEmpty()) return "Não há ingredientes cadastrados.";
+        if (ingredientes.isEmpty()) {
+            return "Não há ingredientes cadastrados.";
+        }
 
-        return "Ingredientes cadastrados: " + ingredients.getContent().stream()
+        String lista = ingredientes.getContent().stream()
                 .map(Ingrediente::getNomeIngrediente)
-                .collect(Collectors.joining(", ")) + ".";
+                .map(nome -> "• " + nome)
+                .collect(Collectors.joining("\n"));
+
+        return """
+            Ingredientes cadastrados
+
+            %s
+            """.formatted(lista).trim();
     }
 
     private String formatarReceitaDTO(ReceitaDTO receitaDTO) {
-        String ingredients = receitaDTO.ingredientes().isEmpty()
-                ? "Nenhum ingrediente cadastrado."
+        String ingredientes = receitaDTO.ingredientes().isEmpty()
+                ? "• Nenhum ingrediente cadastrado."
                 : receitaDTO.ingredientes().stream()
                 .map(this::formatarReceitaIngrediente)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining("\n"));
 
-        return "A receita " + receitaDTO.nomeReceita() + " custa R$ " + receitaDTO.custoPorReceita()
-                + " e possui os ingredientes: " + ingredients;
-    }
-
-    private String formatarReceitaIngrediente(ReceitaIngrediente receitaIngredienteDTO) {
-        String abbreviation = receitaIngredienteDTO.getIngrediente().getUnidadeMedida().getAbreviacao();
-        return receitaIngredienteDTO.getIngrediente().getNomeIngrediente() + ": " + receitaIngredienteDTO.getQuantidade()
-                + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
+        return """
+            %s
+            Custo da receita: %s
+            Ingredientes: 
+            %s
+            """.formatted(
+                receitaDTO.nomeReceita(),
+                formatarDinheiro(receitaDTO.custoPorReceita()),
+                ingredientes
+        ).trim();
     }
 
     private String formatarReceitaIngrediente(ReceitaIngredienteDTO receitaIngredienteDTO) {
         String abbreviation = receitaIngredienteDTO.unidadeMedida().getAbreviacao();
-        return receitaIngredienteDTO.nomeIngrediente() + ": " + receitaIngredienteDTO.quantidade()
-                + (abbreviation == null || abbreviation.isBlank() ? "" : " " + abbreviation);
+
+        return "• " + receitaIngredienteDTO.nomeIngrediente()
+                + ": " + formatarNumero(receitaIngredienteDTO.quantidade())
+                + (abbreviation == null || abbreviation.isBlank()
+                ? ""
+                : " " + abbreviation);
     }
 
     private String formatarIngrediente(Ingrediente ingrediente) {
-        return ingrediente.getNomeIngrediente() + ", categoria " + ingrediente.getCategoriaIngrediente().getNomeCategoria()
-                + ", preço por unidade R$ " + ingrediente.getCustoPorUnidade() + ".";
+        String unidade = ingrediente.getUnidadeMedida() == null
+                ? ""
+                : ingrediente.getUnidadeMedida().getAbreviacao();
+
+        String estoqueAtual = formatarNumero(ingrediente.getEstoqueAtual());
+
+        String estoqueMinimo = formatarNumero(ingrediente.getEstoqueMinimo());
+
+        if (!unidade.isBlank()) {
+            estoqueAtual += " " + unidade;
+            estoqueMinimo += " " + unidade;
+        }
+
+        return """
+            %s
+            Categoria: %s
+            Preço por unidade: %s
+            Estoque atual: %s
+            Estoque mínimo: %s
+            """.formatted(
+                ingrediente.getNomeIngrediente(),
+                ingrediente.getCategoriaIngrediente().getNomeCategoria(),
+                formatarDinheiro(ingrediente.getCustoPorUnidade()),
+                estoqueAtual,
+                estoqueMinimo
+        ).trim();
     }
 
     private String extrairTexto(JsonNode response) {
@@ -224,6 +279,28 @@ public class AssistenteService {
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Não foi possível fazer a requisição para a Ia", exception);
         }
+    }
+
+    private String formatarDinheiro(BigDecimal valor) {
+        if (valor == null) {
+            return "R$ 0,00";
+        }
+
+        return "R$ " + valor
+                .setScale(2, RoundingMode.HALF_UP)
+                .toString()
+                .replace('.', ',');
+    }
+
+    private String formatarNumero(BigDecimal valor) {
+        if (valor == null) {
+            return "0,00";
+        }
+
+        return valor
+                .setScale(2, RoundingMode.HALF_UP)
+                .toString()
+                .replace('.', ',');
     }
 }
 

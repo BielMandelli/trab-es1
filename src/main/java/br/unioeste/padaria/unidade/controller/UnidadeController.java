@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/unidade")
 public class UnidadeController {
 
-    UnidadeService unidadeService;
+    private final UnidadeService unidadeService;
 
     @PostMapping
     public ResponseEntity<UnidadeMedida> salvarUnidade(

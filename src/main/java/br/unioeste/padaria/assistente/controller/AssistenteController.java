@@ -1,8 +1,8 @@
-package br.unioeste.padaria.assistant.controller;
+package br.unioeste.padaria.assistente.controller;
 
-import br.unioeste.padaria.assistant.dto.RequisicaoChatDTO;
-import br.unioeste.padaria.assistant.dto.RespostaChatDTO;
-import br.unioeste.padaria.assistant.service.AssistenteService;
+import br.unioeste.padaria.assistente.dto.RequisicaoChatDTO;
+import br.unioeste.padaria.assistente.dto.RespostaChatDTO;
+import br.unioeste.padaria.assistente.service.AssistenteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

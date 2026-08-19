@@ -1,4 +1,4 @@
-package br.unioeste.padaria.assistant.dto;
+package br.unioeste.padaria.assistente.dto;
 
 public record RespostaChatDTO(
         String intencao,
