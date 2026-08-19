@@ -19,7 +19,6 @@ public record ReceitaDTO(
         UnidadeMedida unidadeMedida,
         Integer tempoPreparo,
         List<ReceitaIngredienteDTO> ingredientes,
-        BigDecimal custoPorUnidade,
         BigDecimal custoPorReceita
 ) {
 

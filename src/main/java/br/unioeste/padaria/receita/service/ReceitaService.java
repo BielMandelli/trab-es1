@@ -223,8 +223,7 @@ public class ReceitaService {
                 })
                 .toList();
 
-        BigDecimal custoPorUnidade = calcularCustoPorUnidade(receita.getIngredientList());
-        BigDecimal custoPorReceita = calcularCustoPorReceita(custoPorUnidade, receita.getRendimento());
+        BigDecimal custoPorReceita = calcularCustoPorReceita(receita.getIngredientList());
 
         return new ReceitaDTO(
                 receita.getIdReceita(),
@@ -234,12 +233,11 @@ public class ReceitaService {
                 receita.getUnidadeMedida(),
                 receita.getTempoPreparo(),
                 ingredienteList,
-                custoPorUnidade,
                 custoPorReceita
         );
     }
 
-    private BigDecimal calcularCustoPorUnidade(List<ReceitaIngrediente> ingredienteList){
+    private BigDecimal calcularCustoPorReceita(List<ReceitaIngrediente> ingredienteList){
         BigDecimal custoTotal = BigDecimal.ZERO;
 
         for (ReceitaIngrediente receitaIngrediente : ingredienteList){
@@ -251,10 +249,6 @@ public class ReceitaService {
         }
 
         return custoTotal;
-    }
-
-    private BigDecimal calcularCustoPorReceita(BigDecimal custoPorUnidade, BigDecimal rendimento){
-        return custoPorUnidade.multiply(rendimento);
     }
 
     public SimulacaoReceitaDTO simularReceita(@Valid CriarSimulacaoReceitaDTO dto) {
