@@ -55,16 +55,16 @@ public class AssistenteService {
     private String modeloIa;
 
     public RespostaChatDTO chat(String mensagemUsuario) {
-        IntencaoAssistenteDTO intent = interpretar(mensagemUsuario);
-        String response = switch (intent.acao()) {
-            case "ENCONTRAR_RECEITA_PELO_NOME" -> encontrarReceitaPeloNome(intent.nomeReceita());
-            case "ENCONTRAR_RECEITA_PELO_ID" -> encontrarReceitaPeloId(intent.idReceita());
+        IntencaoAssistenteDTO intencao = interpretar(mensagemUsuario);
+        String resposta = switch (intencao.acao()) {
+            case "ENCONTRAR_RECEITA_PELO_NOME" -> encontrarReceitaPeloNome(intencao.nomeReceita());
+            case "ENCONTRAR_RECEITA_PELO_ID" -> encontrarReceitaPeloId(intencao.idReceita());
             case "LISTAR_RECEITAS" -> listarReceitas();
-            case "ENCONTRAR_INGREDIENTE_PELO_NOME" -> encontrarIngredientePeloNome(intent.nomeIngrediente());
+            case "ENCONTRAR_INGREDIENTE_PELO_NOME" -> encontrarIngredientePeloNome(intencao.nomeIngrediente());
             case "LISTAR_INGREDIENTES" -> listarIngredientes();
             default -> "Não entendi o pedido. Você pode pedir uma receita ou um ingrediente pelo nome.";
         };
-        return new RespostaChatDTO(intent.acao(), response);
+        return new RespostaChatDTO(intencao.acao(), resposta);
     }
 
     private IntencaoAssistenteDTO interpretar(String mensagemUsuario) {

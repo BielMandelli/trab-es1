@@ -128,8 +128,6 @@ public class ReceitaService {
             }
         }
 
-
-
         return receitaRepository.save(receita);
     }
 
